@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31624.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OgeSharp", "OgeSharp\OgeSharp.csproj", "{9A4D4029-1455-44F3-AB02-CE7E6CEBEDBB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unige", "Unige\Unige.csproj", "{7561BAC0-0F00-4157-BAF6-B8EF91495B9E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9A4D4029-1455-44F3-AB02-CE7E6CEBEDBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A4D4029-1455-44F3-AB02-CE7E6CEBEDBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A4D4029-1455-44F3-AB02-CE7E6CEBEDBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A4D4029-1455-44F3-AB02-CE7E6CEBEDBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7561BAC0-0F00-4157-BAF6-B8EF91495B9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7561BAC0-0F00-4157-BAF6-B8EF91495B9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7561BAC0-0F00-4157-BAF6-B8EF91495B9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7561BAC0-0F00-4157-BAF6-B8EF91495B9E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9C242332-3362-49EB-8C10-4E11171BD740}
+	EndGlobalSection
+EndGlobal
