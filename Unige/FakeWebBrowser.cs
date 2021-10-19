@@ -66,6 +66,11 @@ namespace Unige {
 
         }
 
+        /// <summary>
+        /// Navigates to the specified uri with the GET method
+        /// </summary>
+        public HttpWebResponse Navigate(Uri uri) => ProcessRequest(CreateRequest(uri));
+
     }
 
 }
