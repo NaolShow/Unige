@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace Unige {
+namespace UnigeWebUtility {
 
     /// <summary>
     /// A fake web browser that keeps it's cookies and tries to hide itself<br/>
