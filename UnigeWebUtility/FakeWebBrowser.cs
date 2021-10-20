@@ -57,7 +57,7 @@ namespace UnigeWebUtility {
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
             // If there is no cookies to save
-            if (response.Headers.Count < (int)HttpResponseHeader.SetCookie) return response;
+            if (response.Headers[HttpResponseHeader.SetCookie] == null) return response;
 
             // Save the cookies
             Cookies.SetCookies(response.ResponseUri, response.Headers[HttpResponseHeader.SetCookie]);
