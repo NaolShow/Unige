@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OgeSharp", "OgeSharp\OgeSha
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnigeWebUtility", "UnigeWebUtility\UnigeWebUtility.csproj", "{3568E75E-90CB-4A03-B2E3-D8F413ABF68E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnigeSoftware", "UnigeSoftware\UnigeSoftware.csproj", "{991CA739-1B61-4D43-B7BF-88840944C08C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{3568E75E-90CB-4A03-B2E3-D8F413ABF68E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3568E75E-90CB-4A03-B2E3-D8F413ABF68E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3568E75E-90CB-4A03-B2E3-D8F413ABF68E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{991CA739-1B61-4D43-B7BF-88840944C08C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{991CA739-1B61-4D43-B7BF-88840944C08C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{991CA739-1B61-4D43-B7BF-88840944C08C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{991CA739-1B61-4D43-B7BF-88840944C08C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
