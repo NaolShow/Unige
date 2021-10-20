@@ -5,9 +5,7 @@ VisualStudioVersion = 16.0.31624.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OgeSharp", "OgeSharp\OgeSharp.csproj", "{9A4D4029-1455-44F3-AB02-CE7E6CEBEDBB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Unige", "Unige\Unige.csproj", "{7561BAC0-0F00-4157-BAF6-B8EF91495B9E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnigeWebUtility", "UnigeWebUtility\UnigeWebUtility.csproj", "{3568E75E-90CB-4A03-B2E3-D8F413ABF68E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnigeWebUtility", "UnigeWebUtility\UnigeWebUtility.csproj", "{3568E75E-90CB-4A03-B2E3-D8F413ABF68E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,10 +17,6 @@ Global
 		{9A4D4029-1455-44F3-AB02-CE7E6CEBEDBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A4D4029-1455-44F3-AB02-CE7E6CEBEDBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A4D4029-1455-44F3-AB02-CE7E6CEBEDBB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7561BAC0-0F00-4157-BAF6-B8EF91495B9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7561BAC0-0F00-4157-BAF6-B8EF91495B9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7561BAC0-0F00-4157-BAF6-B8EF91495B9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7561BAC0-0F00-4157-BAF6-B8EF91495B9E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3568E75E-90CB-4A03-B2E3-D8F413ABF68E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3568E75E-90CB-4A03-B2E3-D8F413ABF68E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3568E75E-90CB-4A03-B2E3-D8F413ABF68E}.Release|Any CPU.ActiveCfg = Release|Any CPU
