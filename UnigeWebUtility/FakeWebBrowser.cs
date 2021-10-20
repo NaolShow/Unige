@@ -10,6 +10,12 @@ namespace UnigeWebUtility {
     public class FakeWebBrowser {
 
         /// <summary>
+        /// Determines if the browser should allow redirections<br/>
+        /// (You must change this here and not for each request at <see cref="HttpWebRequest.AllowAutoRedirect"/> else the cookies will not be saved)
+        /// </summary>
+        public bool AllowRedirections = true;
+
+        /// <summary>
         /// Container that stores the cookies<br/>
         /// (You can modify them from here)
         /// </summary>
@@ -23,6 +29,9 @@ namespace UnigeWebUtility {
 
             // Initialize a web request
             HttpWebRequest request = HttpWebRequest.CreateHttp(uri);
+
+            // Disable the auto redirection
+            request.AllowAutoRedirect = false;
 
             // Quick fix for the wifi hotspot
             // TODO: Warn the user
@@ -56,11 +65,17 @@ namespace UnigeWebUtility {
             // Process the request
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
-            // If there is no cookies to save
-            if (response.Headers[HttpResponseHeader.SetCookie] == null) return response;
+            // If there is some cookies to save
+            if (response.Headers[HttpResponseHeader.SetCookie] != null) {
 
-            // Save the cookies
-            Cookies.SetCookies(response.ResponseUri, response.Headers[HttpResponseHeader.SetCookie]);
+                // Save the cookies
+                Cookies.SetCookies(response.ResponseUri, response.Headers[HttpResponseHeader.SetCookie]);
+
+            }
+
+            // If there is a redirection and the browser allow redirections
+            // => Navigate to the specified uri and return that response instead
+            if (response.Headers[HttpResponseHeader.Location] != null && AllowRedirections == true) return Navigate(new Uri(response.Headers[HttpResponseHeader.Location]));
 
             return response;
 
