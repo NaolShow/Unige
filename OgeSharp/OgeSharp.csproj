@@ -5,12 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Schedule\**" />
-    <EmbeddedResource Remove="Schedule\**" />
-    <None Remove="Schedule\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\UnigeWebUtility\UnigeWebUtility.csproj" />
   </ItemGroup>
 
