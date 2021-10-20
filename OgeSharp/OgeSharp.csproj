@@ -5,7 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Schedule\" />
+    <Compile Remove="Schedule\**" />
+    <EmbeddedResource Remove="Schedule\**" />
+    <None Remove="Schedule\**" />
   </ItemGroup>
 
   <ItemGroup>
