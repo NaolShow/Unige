@@ -4,7 +4,7 @@ using UnigeWebUtility;
 
 namespace OgeSharp {
 
-    public class Oge {
+    public partial class Oge {
 
         #region Constants
 
