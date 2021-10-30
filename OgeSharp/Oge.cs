@@ -12,7 +12,7 @@ namespace OgeSharp {
         internal static readonly Uri LogoutUri = new Uri("https://casiut21.u-bourgogne.fr/logout");
 
         internal static readonly Uri ScheduleUri = new Uri("https://iutdijon.u-bourgogne.fr/oge/stylesheets/etu/planningEtu.xhtml");
-        internal static readonly Uri GradesUrl = new Uri("https://iutdijon.u-bourgogne.fr/oge/stylesheets/etu/bilanEtu.xhtml");
+        internal static readonly Uri GradesUri = new Uri("https://iutdijon.u-bourgogne.fr/oge/stylesheets/etu/bilanEtu.xhtml");
 
         #endregion
 
