@@ -19,9 +19,46 @@ namespace OgeSharp {
         internal FakeWebBrowser Browser = new FakeWebBrowser();
 
         /// <summary>
+        /// Latest username used for login into OGE (used for auto-reconnect)
+        /// </summary>
+        private string Username;
+        /// <summary>
+        /// Latest password used for login into OGE (used for auto-reconnect)
+        /// </summary>
+        private string Password;
+
+        public Oge() {
+
+            // Subscribe to the redirection event
+            Browser.OnRedirection += OnRedirection;
+
+        }
+
+        // Triggered when the browser is getting redirected to another uri
+        private void OnRedirection(object sender, RedirectionEventArgs e) {
+
+            // If there is no username/password saved
+            if (Username == null || Password == null) return;
+
+            // If we are not getting redirected to the authentication page
+            if (e.RedirectionUri.Host != LoginUri.Host || e.RedirectionUri.AbsolutePath != LoginUri.AbsolutePath) return;
+
+            // Log out properly from OGE (prevents having some cookies alive on the authentication page but not on OGE)
+            Browser.Navigate(LogoutUri);
+
+            // Reconnect to OGE
+            Login(Username, Password);
+
+        }
+
+        /// <summary>
         /// Logs in OGE using your username and password
         /// </summary>
         public bool Login(string username, string password) {
+
+            // Save the username and password
+            Username = username;
+            Password = password;
 
             // Download the login page source code and extract the execution token
             string loginSource = Browser.Navigate(LoginUri).GetContent();
@@ -55,7 +92,15 @@ namespace OgeSharp {
         /// <summary>
         /// Logs out of OGE
         /// </summary>
-        public void Logout() => Browser.Navigate(LogoutUri);
+        public void Logout() {
+
+            // Clear the username/password
+            Username = Password = null;
+
+            // Navigate to the logout uri
+            Browser.Navigate(LogoutUri);
+
+        }
 
     }
 
