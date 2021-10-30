@@ -6,7 +6,7 @@ namespace OgeSharp {
     /// Represents an entry for the grades<br/>
     /// (This can be a folder of grades as well as a grade see <see cref="IsFolder"/>)
     /// </summary>
-    public class Entry {
+    public class GradeEntry {
 
         /// <summary>
         /// Determines the normalized max grade value
@@ -16,21 +16,21 @@ namespace OgeSharp {
         /// <summary>
         /// Creates a folder entry with a name and coefficient
         /// </summary>
-        internal Entry(string name, double coefficient) {
+        internal GradeEntry(string name, double coefficient) {
 
             // Save the name and coefficient
             Name = name;
             Coefficient = coefficient;
 
             // Initialize the child entries list
-            Entries = new List<Entry>();
+            Entries = new List<GradeEntry>();
 
         }
 
         /// <summary>
         /// Creates a grade entry with a grade, max grade and coefficient
         /// </summary>
-        internal Entry(double grade, double maxGrade, double coefficient) {
+        internal GradeEntry(double grade, double maxGrade, double coefficient) {
 
             // Save the grade, maxGrade and coefficient
             Grade = grade;
@@ -50,7 +50,7 @@ namespace OgeSharp {
         /// List the child of the Entry (in case the current entry is a folder)<br/>
         /// (Only available if the entry IS a folder, else the list equals null)
         /// </summary>
-        public List<Entry> Entries { get; }
+        public List<GradeEntry> Entries { get; }
 
         #endregion
 
@@ -108,7 +108,7 @@ namespace OgeSharp {
             double gradesCount = 0;
 
             // Loop through the child entries
-            foreach (Entry entry in Entries) {
+            foreach (GradeEntry entry in Entries) {
 
                 // Get it's grade or calculate it
                 double grade = entry.GetGradesRecursively();

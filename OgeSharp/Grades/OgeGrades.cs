@@ -20,7 +20,7 @@ namespace OgeSharp {
         /// <summary>
         /// Returns a list of entries containing your grades
         /// </summary>
-        public List<Entry> GetGrades() {
+        public List<GradeEntry> GetGrades() {
 
             // Download the grades page source code and parse it as a document
             string gradesSource = Browser.Navigate(GradesUri).GetContent();
@@ -31,8 +31,8 @@ namespace OgeSharp {
             HtmlNodeCollection rows = document.DocumentNode.SelectNodes("//table//tbody//tr");
 
             // Initialize the entries and hierarchy
-            List<Entry> entries = new List<Entry>();
-            Stack<Entry> stackEntries = new Stack<Entry>();
+            List<GradeEntry> entries = new List<GradeEntry>();
+            Stack<GradeEntry> stackEntries = new Stack<GradeEntry>();
 
             // Initialize the previous ui level
             int previousLevel = -1;
@@ -61,10 +61,10 @@ namespace OgeSharp {
                     }
 
                     // Create the folder entry
-                    Entry folderEntry = new Entry(rowName, rowCoefficient);
+                    GradeEntry folderEntry = new GradeEntry(rowName, rowCoefficient);
 
                     // If the folder have a parent then add it as a child
-                    if (stackEntries.TryPeek(out Entry parent)) {
+                    if (stackEntries.TryPeek(out GradeEntry parent)) {
                         parent.Entries.Add(folderEntry);
                     }
                     // Else add it directly to the entries list
@@ -83,7 +83,7 @@ namespace OgeSharp {
                 else {
 
                     // Initialize a row entry and add it 
-                    Entry rowEntry = new Entry(rowName, rowCoefficient);
+                    GradeEntry rowEntry = new GradeEntry(rowName, rowCoefficient);
                     stackEntries.Peek().Entries.Add(rowEntry);
 
                     // Get the inner text of the grades column
@@ -104,7 +104,7 @@ namespace OgeSharp {
                             MatchCollection matches = NotesRegex.Matches(line);
 
                             // Initialize the grade entry
-                            Entry gradeEntry = new Entry(gradeName, double.Parse(matches[matches.Count - 1].Groups[1].Value, CultureInfo.InvariantCulture));
+                            GradeEntry gradeEntry = new GradeEntry(gradeName, double.Parse(matches[matches.Count - 1].Groups[1].Value, CultureInfo.InvariantCulture));
                             rowEntry.Entries.Add(gradeEntry);
 
                             // Loop through the grades
@@ -116,7 +116,7 @@ namespace OgeSharp {
                                 double coefficient = double.Parse(matches[n + 2].Groups[1].Value, CultureInfo.InvariantCulture);
 
                                 // Add a new grade entry
-                                gradeEntry.Entries.Add(new Entry(grade, maxGrade, coefficient));
+                                gradeEntry.Entries.Add(new GradeEntry(grade, maxGrade, coefficient));
 
                             }
 
