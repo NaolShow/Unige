@@ -22,6 +22,11 @@ namespace UnigeWebUtility {
         public CookieContainer Cookies = new();
 
         /// <summary>
+        /// Event that is triggered when the web browser is getting redirected to another uri
+        /// </summary>
+        public event EventHandler<RedirectionEventArgs> OnRedirection;
+
+        /// <summary>
         /// Creates a http web request faking a web browser<br/>
         /// (Get the response of the request with <see cref="ProcessRequest(HttpWebRequest)"/>)
         /// </summary>
@@ -75,7 +80,20 @@ namespace UnigeWebUtility {
 
             // If there is a redirection and the browser allow redirections
             // => Navigate to the specified uri and return that response instead
-            if (response.Headers[HttpResponseHeader.Location] != null && AllowRedirections == true) return Navigate(new Uri(response.Headers[HttpResponseHeader.Location]));
+            if (response.Headers[HttpResponseHeader.Location] != null && AllowRedirections == true) {
+
+                // Create a uri from the location header
+                Uri redirection = new Uri(response.Headers[HttpResponseHeader.Location]);
+
+                // Initialize new redirection event and trigger the redirection event
+                OnRedirection?.Invoke(this, new RedirectionEventArgs() {
+                    RequestedUri = request.RequestUri,
+                    RedirectionUri = redirection
+                });
+
+                return Navigate(redirection);
+
+            };
 
             return response;
 
@@ -85,6 +103,13 @@ namespace UnigeWebUtility {
         /// Navigates to the specified uri with the GET method
         /// </summary>
         public HttpWebResponse Navigate(Uri uri) => ProcessRequest(CreateRequest(uri));
+
+    }
+
+    public class RedirectionEventArgs : EventArgs {
+
+        public Uri RequestedUri { get; set; }
+        public Uri RedirectionUri { get; set; }
 
     }
 
