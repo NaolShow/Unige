@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <Authors>NaolShow</Authors>
+    <Company>ToWolf</Company>
+    <Description>OgeSharp is a library made to interact with OGE (outils gestion d'étudiants) used by the IUTs of the University of Bourgogne (Not affiliated)</Description>
+    <Copyright>NaolShow</Copyright>
+    <PackageLicenseFile>LICENCE</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/NaolShow/Unige</PackageProjectUrl>
+    <NeutralLanguage></NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +20,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\UnigeWebUtility\UnigeWebUtility.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENCE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
