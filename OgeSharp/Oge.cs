@@ -16,7 +16,10 @@ namespace OgeSharp {
 
         #endregion
 
-        internal FakeWebBrowser Browser = new FakeWebBrowser();
+        /// <summary>
+        /// Fake web browser used by Oge instance
+        /// </summary>
+        public readonly FakeWebBrowser Browser = new FakeWebBrowser();
 
         /// <summary>
         /// Latest username used for login into OGE (used for auto-reconnect)
