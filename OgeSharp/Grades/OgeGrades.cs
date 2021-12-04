@@ -1,7 +1,7 @@
 ﻿using HtmlAgilityPack;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
+using System.Net;
 using System.Text.RegularExpressions;
 using UnigeWebUtility;
 
@@ -9,116 +9,130 @@ namespace OgeSharp {
 
     public partial class Oge {
 
-        internal Regex UINodeLevelRegex = new Regex(@"ui-node-level-([1-9]+)");
-        internal Regex NotesRegex = new Regex(@"([0-9]+.[0-9]+)");
-
-        // TODO: There is one case in which the system will not work:
-        // If there is a grade that is not inside a folder
-        // If that's the case the method will just crash.
-        // It should never be the case, but if it is I'll need to fix it
+        /// <summary>
+        /// Regex that let's me extract numbers from a string<br/>
+        /// Example: "QCM [17.00 /20.0(1.0) 20.00 /20.0(1.0) 17.50 /20.0(1.0) ](1.0)"<br/>
+        /// Will return all the numbers: 17.00, 20.0, 1.0, 20.00, 20.0, 1.0, 17.50, 20.0, 1.0, 1.0
+        /// </summary>
+        internal Regex GradesRegex = new Regex(@"([0-9]+.[0-9]+)");
 
         /// <summary>
-        /// Returns a list of entries containing your grades
+        /// Send a request to get the row's childs and returns them<br/>
+        /// Returns null if the row do not have any child (mean it's not a folder)
         /// </summary>
-        public List<GradeEntry> GetGrades() {
+        private HtmlNodeCollection GetRowChilds(HtmlNode row) {
 
-            // Download the grades page source code and parse it as a document
-            string gradesSource = Browser.Navigate(GradesUri).GetContent();
-            HtmlDocument document = new HtmlDocument();
-            document.LoadHtml(gradesSource);
+            // TODO: Optimization send multiple requests at the same time
+            // Requests are the bottleneck here
 
-            // Get all the table rows
-            HtmlNodeCollection rows = document.DocumentNode.SelectNodes("//table//tbody//tr");
+            // Check if the row is a folder
+            // => It's a folder only if the latest span do not have a style attribute
+            if (string.IsNullOrEmpty(row.SelectSingleNode("./td[1]/span[last()]").GetAttributeValue("style", null))) {
 
-            // Initialize the entries and hierarchy
-            List<GradeEntry> entries = new List<GradeEntry>();
-            Stack<GradeEntry> stackEntries = new Stack<GradeEntry>();
+                // Optimization: I should not always send a request everytime
+                // => By default the first semester is opened
+                // => But for simplicity let's just always send a request
 
-            // Initialize the previous ui level
-            int previousLevel = -1;
+                // Get the row id (needed for the ajax request)
+                string rowID = row.GetAttributeValue("data-rk", null);
 
-            // Loop through all the rows (backwards)
-            foreach (HtmlNode row in rows) {
+                // Initialize a request with POST method
+                HttpWebRequest request = Browser.CreateRequest(GradesUri);
+                request.Method = "POST";
 
-                // Get the row name and coefficient
-                string rowName = row.SelectSingleNode(".//td[1]").InnerText;
-                double rowCoefficient = double.Parse(row.SelectSingleNode(".//td[2]").InnerText, CultureInfo.InvariantCulture);
+                // Set the request content
+                request.SetContent("application/x-www-form-urlencoded",
+                    $"javax.faces.partial.ajax=true&javax.faces.partial.render=mainBilanForm%3AtreeTable&mainBilanForm%3AtreeTable_expand={rowID}");
 
-                // Get the row ui level
-                int uiLevel = int.Parse(UINodeLevelRegex.Match(string.Join(' ', row.GetClasses())).Groups[1].Value);
+                // Process the request and extract the row's html
+                HttpWebResponse response = Browser.ProcessRequest(request);
+                string html = response.GetContent().Split("[CDATA[")[1].Split("]]")[0];
 
-                #region Folder processing
+                // Parse the html as a document
+                HtmlDocument document = new HtmlDocument();
+                document.LoadHtml(html);
 
-                // If it's a folder
-                // By default the "aria-expanded" attribute is set to true for a subject folder
-                if (row.GetAttributeValue("aria-expanded", true)) {
+                // Return the row's node
+                return document.DocumentNode.SelectNodes("./tr");
 
-                    // If we got back in the hierarchy then get back in the entries
-                    if (previousLevel > uiLevel) {
+            }
+            return null;
 
-                        for (int level = 0; level < previousLevel - uiLevel; level++) stackEntries.Pop();
+        }
 
-                    }
+        /// <summary>
+        /// Processes a row and it's childs recursively
+        /// </summary>
+        private void ProcessRow(GradeEntry entry, HtmlNode row) {
 
-                    // Create the folder entry
-                    GradeEntry folderEntry = new GradeEntry(rowName, rowCoefficient);
+            // Get the coefficient text
+            string coefficientText = row.SelectSingleNode(".//td[2]").InnerText;
 
-                    // If the folder have a parent then add it as a child
-                    if (stackEntries.TryPeek(out GradeEntry parent)) {
-                        parent.Entries.Add(folderEntry);
-                    }
-                    // Else add it directly to the entries list
-                    else {
-                        entries.Add(folderEntry);
-                    }
+            // If the row do not have a coefficient then we just drop it
+            // => Resolves crash when there is no coefficient
+            if (string.IsNullOrEmpty(coefficientText)) return;
 
-                    // Push the entry in the hierarchy
-                    stackEntries.Push(folderEntry);
+            // Get the row name and coefficient
+            string name = row.SelectSingleNode("./td[1]").GetDirectInnerText();
+            double coefficient = double.Parse(coefficientText, CultureInfo.InvariantCulture);
 
-                }
+            #region Folder processing
 
-                #endregion
-                #region Entry processing
+            // Try to get the row's childs
+            HtmlNodeCollection childs = GetRowChilds(row);
 
-                else {
+            // If it's a folder row
+            if (childs != null) {
 
-                    // Initialize a row entry and add it 
-                    GradeEntry rowEntry = new GradeEntry(rowName, rowCoefficient);
-                    stackEntries.Peek().Entries.Add(rowEntry);
+                // Create the folder's entry and add it to the parent
+                GradeEntry folderEntry = new GradeEntry(name, coefficient);
+                entry.Entries.Add(folderEntry);
 
-                    // Get the inner text of the grades column
-                    string grades = row.SelectSingleNode(".//td[3]").InnerText;
+                // Loop through the childs and process them
+                foreach (HtmlNode child in childs) ProcessRow(folderEntry, child);
 
-                    // If the subject have some grades
-                    if (!string.IsNullOrEmpty(grades)) {
+            }
 
-                        // Loop through each lines of grades (looks like this):
-                        // => gradeName [10.00 /10.0(1.0)   ](1.0)
-                        // => gradeName  [4.50 /5.0(1.0)  8.00 /10.0(1.0)   ](1.0)
-                        foreach (string line in grades.Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)) {
+            #endregion
+            #region Subject processing
 
-                            // Get the grade name
-                            string gradeName = line.Split('[')[0].TrimEnd();
+            else {
 
-                            // Get the grades and the coefficients
-                            MatchCollection matches = NotesRegex.Matches(line);
+                // Initialize a row entry and add to the parent
+                GradeEntry rowEntry = new GradeEntry(name, coefficient);
+                entry.Entries.Add(rowEntry);
 
-                            // Initialize the grade entry
-                            GradeEntry gradeEntry = new GradeEntry(gradeName, double.Parse(matches[matches.Count - 1].Groups[1].Value, CultureInfo.InvariantCulture));
-                            rowEntry.Entries.Add(gradeEntry);
+                // Get the grades text (third column)
+                string gradesText = row.SelectSingleNode("./td[3]").InnerText;
 
-                            // Loop through the grades
-                            for (int n = 0; n < matches.Count - 1; n += 3) {
+                // If the subject have some grades
+                if (!string.IsNullOrEmpty(gradesText)) {
 
-                                // Get the grade, max grade and coefficient
-                                double grade = double.Parse(matches[n].Groups[1].Value, CultureInfo.InvariantCulture);
-                                double maxGrade = double.Parse(matches[n + 1].Groups[1].Value, CultureInfo.InvariantCulture);
-                                double coefficient = double.Parse(matches[n + 2].Groups[1].Value, CultureInfo.InvariantCulture);
+                    // Loop through each lines of grades (looks like this):
+                    // => gradeName [10.00 /10.0(1.0)   ](1.0)
+                    // => gradeName  [4.50 /5.0(1.0)  8.00 /10.0(1.0)   ](1.0)
+                    foreach (string line in gradesText.Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)) {
 
-                                // Add a new grade entry
-                                gradeEntry.Entries.Add(new GradeEntry(grade, maxGrade, coefficient));
+                        // Get the grade name
+                        string gradeName = line.Split('[')[0].TrimEnd();
 
-                            }
+                        // Get the grades and the coefficients
+                        MatchCollection matches = GradesRegex.Matches(line);
+
+                        // Initialize the grade entry
+                        GradeEntry gradeEntry = new GradeEntry(gradeName, double.Parse(matches[^1].Groups[1].Value, CultureInfo.InvariantCulture));
+                        rowEntry.Entries.Add(gradeEntry);
+
+                        // Loop through the grades
+                        for (int n = 0; n < matches.Count - 1; n += 3) {
+
+                            // Get the grade, max grade and coefficient
+                            double grade = double.Parse(matches[n].Groups[1].Value, CultureInfo.InvariantCulture);
+                            double maxGrade = double.Parse(matches[n + 1].Groups[1].Value, CultureInfo.InvariantCulture);
+                            double gradeCoefficient = double.Parse(matches[n + 2].Groups[1].Value, CultureInfo.InvariantCulture);
+
+                            // Add a new grade entry
+                            gradeEntry.Entries.Add(new GradeEntry(grade, maxGrade, gradeCoefficient));
 
                         }
 
@@ -126,13 +140,34 @@ namespace OgeSharp {
 
                 }
 
-                #endregion
+            }
 
-                // Save the current ui level as the previous one for the next iteration
-                previousLevel = uiLevel;
+            #endregion
+
+        }
+
+        /// <summary>
+        /// Returns an entry containing all your grades
+        /// </summary>
+        public GradeEntry GetGrades() {
+
+            // Download the grades page source code and parse it as a document
+            string gradesSource = Browser.Navigate(GradesUri).GetContent();
+            HtmlDocument document = new HtmlDocument();
+            document.LoadHtml(gradesSource);
+
+            // Create a root entry
+            GradeEntry rootEntry = new GradeEntry("Root", 1);
+
+            // Loop through all the rows that have a UI Level of 1
+            // => It's the top most rows
+            foreach (HtmlNode topRow in document.DocumentNode.SelectNodes("//tbody/tr[contains(@class, 'ui-node-level-1')]")) {
+
+                // Process the row
+                ProcessRow(rootEntry, topRow);
 
             }
-            return entries;
+            return rootEntry;
 
         }
 
