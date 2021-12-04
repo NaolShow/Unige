@@ -4,17 +4,18 @@ namespace OgeSharp {
 
     /// <summary>
     /// Represents an entry for the grades<br/>
-    /// (This can be a folder of grades as well as a grade see <see cref="IsFolder"/>)
+    /// (This can represent a grade by itself as well as a folder of entries see <see cref="IsFolder"/>)
     /// </summary>
     public class GradeEntry {
 
         /// <summary>
-        /// Determines the normalized max grade value
+        /// Determines the normalized max grade value<br/>
+        /// (Used for <see cref="NormalizedGrade"/>)
         /// </summary>
         public const double NormalizedValue = 20;
 
         /// <summary>
-        /// Creates a folder entry with a name and coefficient
+        /// Creates a folder of entries with it's name and it's coefficient
         /// </summary>
         internal GradeEntry(string name, double coefficient) {
 
@@ -28,7 +29,7 @@ namespace OgeSharp {
         }
 
         /// <summary>
-        /// Creates a grade entry with a grade, max grade and coefficient
+        /// Creates a grade with it's grade, it's max grade and it's coefficient
         /// </summary>
         internal GradeEntry(double grade, double maxGrade, double coefficient) {
 
@@ -42,34 +43,36 @@ namespace OgeSharp {
         #region Folder
 
         /// <summary>
-        /// Determines if the entry is a folder for other entries
+        /// Determines if the entry is a folder of entries
         /// </summary>
         public bool IsFolder => Name != null;
 
         /// <summary>
-        /// List the child of the Entry (in case the current entry is a folder)<br/>
-        /// (Only available if the entry IS a folder, else the list equals null)
+        /// Name of the grade's folder
+        /// </summary>
+        public string Name;
+
+        /// <summary>
+        /// List containing all the child entries of the current one<br/>
+        /// (Equals null if the entry is not a folder)
         /// </summary>
         public List<GradeEntry> Entries { get; }
 
         #endregion
 
         /// <summary>
-        /// Determines the name of the entry
-        /// </summary>
-        public string Name;
-
-        /// <summary>
-        /// Represents the normalized entry's grade to 20 (its grade is adjusted to have a maximum of 20)<br/>
-        /// (Only available if the entry is NOT a folder)
+        /// Represents the normalized entry's grade to <see cref="NormalizedValue"/> (its grade is adjusted to have a maximum of <see cref="NormalizedValue"/>)<br/>
+        /// (Only available for non-folder entries)
         /// </summary>
         public double NormalizedGrade => _Grade * NormalizedValue / MaxGrade;
 
+        // Represents the cached value of the grade
+        // => Not necessarily set if the entry is a folder
         private double _Grade = double.NaN;
 
         /// <summary>
-        /// Gets the grade if the entry is one OR<br/>
-        /// Gets the average of the child grades if the entry is a folder
+        /// Gets the actual grade if it's not a folder entry<br/>
+        /// Gets the average of all the childs grades if it's a folder (this is done recursively to the bottom of the tree)
         /// </summary>
         public double Grade {
 
@@ -85,35 +88,44 @@ namespace OgeSharp {
                 return GetGradesRecursively();
 
             }
-            set => _Grade = value;
+            set {
+
+                // If it's a folder then don't do anything
+                if (IsFolder) return;
+
+                // Save the grade
+                _Grade = value;
+
+            }
 
         }
         public double MaxGrade { get; }
         public double Coefficient { get; }
 
         /// <summary>
-        /// Returns the grade if the entry is a grade AND<br/>
-        /// Calculates the average of all the child grades if it's a folder
+        /// Returns the normalized grade if it's a grade entry<br/>
+        /// Returns the average of all the childs grades if it's a folder 
         /// </summary>
         internal double GetGradesRecursively() {
 
-            // If it's not a folder
+            // If it's not a folder return the normalized grade
+            // => All the grades are normalized for the average, else it will be wrong
             if (!IsFolder) return NormalizedGrade;
 
             // If the folder do not have any grade
             if (Entries.Count <= 0) return double.NaN;
 
-            // Initialize the grades sum and count (taking in account the coefficients)
+            // Initialize the grades sum and count (takes in account the coefficients)
             double gradesSum = 0;
             double gradesCount = 0;
 
             // Loop through the child entries
             foreach (GradeEntry entry in Entries) {
 
-                // Get it's grade or calculate it
+                // Get the child entry grade
                 double grade = entry.GetGradesRecursively();
 
-                // If the grade is NaN (the folder have no grade)
+                // If the folder do not have any grade then we don't take it in account
                 if (double.IsNaN(grade)) continue;
 
                 // Increase the grades count
@@ -122,7 +134,8 @@ namespace OgeSharp {
 
             }
 
-            // Cache the average of the grades
+            // Cache the grade's value
+            // => To prevent having to run again this whole loop if the user gets back the average
             _Grade = gradesSum / gradesCount;
             return _Grade;
 

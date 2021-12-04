@@ -9,7 +9,12 @@ namespace OgeSharp {
 
     public partial class Oge {
 
-        internal Regex NotesRegex = new Regex(@"([0-9]+.[0-9]+)");
+        /// <summary>
+        /// Regex that let's me extract numbers from a string<br/>
+        /// Example: "QCM [17.00 /20.0(1.0) 20.00 /20.0(1.0) 17.50 /20.0(1.0) ](1.0)"<br/>
+        /// Will return all the numbers: 17.00, 20.0, 1.0, 20.00, 20.0, 1.0, 17.50, 20.0, 1.0, 1.0
+        /// </summary>
+        internal Regex GradesRegex = new Regex(@"([0-9]+.[0-9]+)");
 
         /// <summary>
         /// Send a request to get the row's childs and returns them<br/>
@@ -17,11 +22,14 @@ namespace OgeSharp {
         /// </summary>
         private HtmlNodeCollection GetRowChilds(HtmlNode row) {
 
+            // TODO: Optimization send multiple requests at the same time
+            // Requests are the bottleneck here
+
             // Check if the row is a folder
             // => It's a folder only if the latest span do not have a style attribute
             if (string.IsNullOrEmpty(row.SelectSingleNode("./td[1]/span[last()]").GetAttributeValue("style", null))) {
 
-                // Optimization: I could not always send a request everytime
+                // Optimization: I should not always send a request everytime
                 // => By default the first semester is opened
                 // => But for simplicity let's just always send a request
 
@@ -57,51 +65,62 @@ namespace OgeSharp {
         /// </summary>
         private void ProcessRow(GradeEntry entry, HtmlNode row) {
 
-            #region Row data
-
             // Get the coefficient text
             string coefficientText = row.SelectSingleNode(".//td[2]").InnerText;
 
-            // If the row do not have a coefficient then we stop
-            // => We don't care about it's childs
+            // If the row do not have a coefficient then we just drop it
+            // => Resolves crash when there is no coefficient
             if (string.IsNullOrEmpty(coefficientText)) return;
 
-            // Get the row name
+            // Get the row name and coefficient
             string name = row.SelectSingleNode("./td[1]").GetDirectInnerText();
-
-            // Get the coefficient
             double coefficient = double.Parse(coefficientText, CultureInfo.InvariantCulture);
 
+            #region Folder processing
+
+            // Try to get the row's childs
+            HtmlNodeCollection childs = GetRowChilds(row);
+
+            // If it's a folder row
+            if (childs != null) {
+
+                // Create the folder's entry and add it to the parent
+                GradeEntry folderEntry = new GradeEntry(name, coefficient);
+                entry.Entries.Add(folderEntry);
+
+                // Loop through the childs and process them
+                foreach (HtmlNode child in childs) ProcessRow(folderEntry, child);
+
+            }
+
             #endregion
+            #region Subject processing
 
-            #region Grades processing
-
-            // Get the text of the third column (grades column)
-            string grades = row.SelectSingleNode("./td[3]").InnerText;
-
-            // If the row is a grades row
-            if (!string.IsNullOrEmpty(grades)) {
+            else {
 
                 // Initialize a row entry and add to the parent
                 GradeEntry rowEntry = new GradeEntry(name, coefficient);
                 entry.Entries.Add(rowEntry);
 
+                // Get the grades text (third column)
+                string gradesText = row.SelectSingleNode("./td[3]").InnerText;
+
                 // If the subject have some grades
-                if (!string.IsNullOrEmpty(grades)) {
+                if (!string.IsNullOrEmpty(gradesText)) {
 
                     // Loop through each lines of grades (looks like this):
                     // => gradeName [10.00 /10.0(1.0)   ](1.0)
                     // => gradeName  [4.50 /5.0(1.0)  8.00 /10.0(1.0)   ](1.0)
-                    foreach (string line in grades.Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)) {
+                    foreach (string line in gradesText.Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)) {
 
                         // Get the grade name
                         string gradeName = line.Split('[')[0].TrimEnd();
 
                         // Get the grades and the coefficients
-                        MatchCollection matches = NotesRegex.Matches(line);
+                        MatchCollection matches = GradesRegex.Matches(line);
 
                         // Initialize the grade entry
-                        GradeEntry gradeEntry = new GradeEntry(gradeName, double.Parse(matches[matches.Count - 1].Groups[1].Value, CultureInfo.InvariantCulture));
+                        GradeEntry gradeEntry = new GradeEntry(gradeName, double.Parse(matches[^1].Groups[1].Value, CultureInfo.InvariantCulture));
                         rowEntry.Entries.Add(gradeEntry);
 
                         // Loop through the grades
@@ -122,23 +141,6 @@ namespace OgeSharp {
                 }
 
             }
-
-            #endregion
-
-            #region Folder processing
-
-            // Try to get the row's childs
-            HtmlNodeCollection childs = GetRowChilds(row);
-
-            // If it's not a folder then just stop
-            if (childs == null) return;
-
-            // Create the folder's entry and add it to the parent
-            GradeEntry folderEntry = new GradeEntry(name, coefficient);
-            entry.Entries.Add(folderEntry);
-
-            // Loop through the childs and process them
-            foreach (HtmlNode child in childs) ProcessRow(folderEntry, child);
 
             #endregion
 
