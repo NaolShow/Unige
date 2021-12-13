@@ -72,7 +72,7 @@ namespace OgeSharp {
             request.Method = "POST";
 
             // Set the content (username, password, execution token and _eventId)
-            request.SetContent("application/x-www-form-urlencoded", $"username={username}&password={password}&execution={execution}&_eventId=submit");
+            request.SetContent("application/x-www-form-urlencoded", $"username={WebUtility.UrlEncode(username)}&password={WebUtility.UrlEncode(password)}&execution={WebUtility.UrlEncode(execution)}&_eventId=submit");
 
             try {
 
