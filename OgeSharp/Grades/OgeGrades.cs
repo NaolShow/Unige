@@ -113,11 +113,18 @@ namespace OgeSharp {
                     // => gradeName  [4.50 /5.0(1.0)  8.00 /10.0(1.0)   ](1.0)
                     foreach (string line in gradesText.Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)) {
 
+                        // Split the line into two parts
+                        // => [0] : gradeName
+                        // => [1] : grades
+                        string[] splittedLine = line.Split('[');
+
                         // Get the grade name
-                        string gradeName = line.Split('[')[0].TrimEnd();
+                        string gradeName = splittedLine[0].TrimEnd();
 
                         // Get the grades and the coefficients
-                        MatchCollection matches = GradesRegex.Matches(line);
+                        // => We only match the line without the grade name
+                        // => Because if we have a number in the name it will be matched and will crash everything
+                        MatchCollection matches = GradesRegex.Matches(splittedLine[1]);
 
                         // Initialize the grade entry
                         GradeEntry gradeEntry = new GradeEntry(gradeName, double.Parse(matches[^1].Groups[1].Value, CultureInfo.InvariantCulture));
