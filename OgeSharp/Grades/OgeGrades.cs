@@ -65,16 +65,12 @@ namespace OgeSharp {
         /// </summary>
         private void ProcessRow(GradeEntry entry, HtmlNode row) {
 
-            // Get the coefficient text
+            // Get the row coefficient
             string coefficientText = row.SelectSingleNode(".//td[2]").InnerText;
+            bool isCoefficientValid = double.TryParse(coefficientText, NumberStyles.Any, CultureInfo.InvariantCulture, out double coefficient);
 
-            // If the row do not have a coefficient then we just drop it
-            // => Resolves crash when there is no coefficient
-            if (string.IsNullOrEmpty(coefficientText)) return;
-
-            // Get the row name and coefficient
+            // Get the row name
             string name = row.SelectSingleNode("./td[1]").GetDirectInnerText();
-            double coefficient = double.Parse(coefficientText, CultureInfo.InvariantCulture);
 
             #region Folder processing
 
@@ -83,6 +79,22 @@ namespace OgeSharp {
 
             // If it's a folder row
             if (childs != null) {
+
+                // If the row coefficient is not valid
+                if (!isCoefficientValid) {
+
+                    // This fixes an issue where the coefficients are not set (on the website)
+                    // => It might still happen for other people (fixed for GEA)
+
+                    // => If it's a ressource one then it must have 60 as a coefficient
+                    // => If it's an SAE one then it must have 40 as a coefficient
+                    if (name.Contains("Ressour")) coefficient = 60;
+                    else if (name.Contains("SAE")) coefficient = 40;
+
+                    // Else we stop
+                    else return;
+
+                }
 
                 // Create the folder's entry and add it to the parent
                 GradeEntry folderEntry = new GradeEntry(name, coefficient);
@@ -97,6 +109,10 @@ namespace OgeSharp {
             #region Subject processing
 
             else {
+
+                // If the coefficient is not valid
+                // => Then we set it to one (this solves an issue where sometimes the grades haven't any coefficient like in GEA)
+                if (!isCoefficientValid) coefficient = 1;
 
                 // Initialize a row entry and add to the parent
                 GradeEntry rowEntry = new GradeEntry(name, coefficient);
