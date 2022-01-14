@@ -11,6 +11,8 @@ namespace OgeSharp {
         internal static readonly Uri LoginUri = new Uri("https://casiut21.u-bourgogne.fr/login");
         internal static readonly Uri LogoutUri = new Uri("https://casiut21.u-bourgogne.fr/logout");
 
+        internal static readonly Uri HomeUri = new Uri("https://iutdijon.u-bourgogne.fr/oge/stylesheets/etu/home.xhtml");
+
         internal static readonly Uri ScheduleUri = new Uri("https://iutdijon.u-bourgogne.fr/oge/stylesheets/etu/planningEtu.xhtml");
         internal static readonly Uri GradesUri = new Uri("https://iutdijon.u-bourgogne.fr/oge/stylesheets/etu/bilanEtu.xhtml");
 
@@ -59,10 +61,6 @@ namespace OgeSharp {
         /// </summary>
         public bool Login(string username, string password) {
 
-            // Save the username and password
-            Username = username;
-            Password = password;
-
             // Download the login page source code and extract the execution token
             string loginSource = Browser.Navigate(LoginUri).GetContent();
             string execution = loginSource.Split("input type=\"hidden\" name=\"execution\" value=\"")[1].Split("\"/>")[0];
@@ -78,6 +76,18 @@ namespace OgeSharp {
 
                 // Login by processing the request
                 Browser.ProcessRequest(request);
+
+                // Go to the home page to finish correctly the login process
+                // => Fixes a bug where we get redirected to home after the first request
+                Browser.Navigate(HomeUri);
+
+                // Save the username and password
+                // => After the login to prevent infinite logout/login loop
+                Username = username;
+                Password = password;
+
+                // TODO: Get the account first/last name
+
                 return true;
 
             } catch (WebException ex) {

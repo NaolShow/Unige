@@ -80,7 +80,7 @@ namespace UnigeWebUtility {
 
             // If there is a redirection and the browser allow redirections
             // => Navigate to the specified uri and return that response instead
-            if (response.Headers[HttpResponseHeader.Location] != null && AllowRedirections == true) {
+            if (response.Headers[HttpResponseHeader.Location] != null && AllowRedirections) {
 
                 // Create a uri from the location header
                 Uri redirection = new Uri(response.Headers[HttpResponseHeader.Location]);
