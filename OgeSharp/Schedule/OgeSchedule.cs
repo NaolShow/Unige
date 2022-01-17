@@ -54,7 +54,7 @@ namespace OgeSharp {
             List<dynamic> slots = JsonSerializer.Deserialize<dynamic>(json)["events"];
 
             // Initialize a schedule instance
-            Schedule schedule = new Schedule(start, end, slots.Count);
+            Schedule schedule = new(start, end, slots.Count);
 
             // Loop through all the time slots
             for (int i = 0; i < slots.Count; i++) {

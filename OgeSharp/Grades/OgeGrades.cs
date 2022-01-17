@@ -30,11 +30,11 @@ namespace OgeSharp {
 
             // Download the grades page source code and parse it as a document
             string gradesSource = Browser.Navigate(GradesUri).GetContent();
-            HtmlDocument document = new HtmlDocument();
+            HtmlDocument document = new();
             document.LoadHtml(gradesSource);
 
             // Initialize a root entry
-            GradeEntry rootEntry = new GradeEntry("Root", 1);
+            GradeEntry rootEntry = new("Root", 1);
 
             // Loop through all the UE divs
             foreach (HtmlNode ueNode in document.DocumentNode.SelectNodes("//div[@class='moy_UE']")) {
@@ -52,7 +52,7 @@ namespace OgeSharp {
                 if (match.Success) ueCoefficient = double.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
 
                 // Initialize an entry and add it to the parent
-                GradeEntry ueEntry = new GradeEntry(ueName, ueCoefficient);
+                GradeEntry ueEntry = new(ueName, ueCoefficient);
                 rootEntry.Entries.Add(ueEntry);
 
                 // Loop through both poles (ressource and SAE) and process both
@@ -94,7 +94,7 @@ namespace OgeSharp {
             #endregion
 
             // Initialize an entry and add it to the parent
-            GradeEntry poleEntry = new GradeEntry(poleName, poleCoefficient);
+            GradeEntry poleEntry = new(poleName, poleCoefficient);
             rootEntry.Entries.Add(poleEntry);
 
             // Loop through the grades categories and process them
@@ -112,7 +112,7 @@ namespace OgeSharp {
             if (!double.TryParse(gradeCategoryNode.SelectSingleNode("./td[2]").InnerText, NumberStyles.Any, CultureInfo.InvariantCulture, out double categoryCoefficient)) categoryCoefficient = 1;
 
             // Initialize an entry and add it to the parent
-            GradeEntry categoryEntry = new GradeEntry(categoryName, categoryCoefficient);
+            GradeEntry categoryEntry = new(categoryName, categoryCoefficient);
             poleEntry.Entries.Add(categoryEntry);
 
             // Get the grades text and check if there is some grades
@@ -138,7 +138,7 @@ namespace OgeSharp {
                     MatchCollection matches = NumbersRegex.Matches(splittedLine[1]);
 
                     // Initialize the grade entry
-                    GradeEntry gradeEntry = new GradeEntry(gradeName, double.Parse(matches[^1].Groups[1].Value, CultureInfo.InvariantCulture));
+                    GradeEntry gradeEntry = new(gradeName, double.Parse(matches[^1].Groups[1].Value, CultureInfo.InvariantCulture));
                     categoryEntry.Entries.Add(gradeEntry);
 
                     // Loop through the grades

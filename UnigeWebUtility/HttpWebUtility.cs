@@ -36,7 +36,7 @@ namespace UnigeWebUtility {
             using Stream stream = response.GetResponseStream();
 
             // Convert the stream to a stream reader
-            using StreamReader reader = new StreamReader(stream);
+            using StreamReader reader = new(stream);
 
             return reader.ReadToEnd();
 

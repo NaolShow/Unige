@@ -8,20 +8,20 @@ namespace OgeSharp {
 
         #region Constants
 
-        internal static readonly Uri LoginUri = new Uri("https://casiut21.u-bourgogne.fr/login");
-        internal static readonly Uri LogoutUri = new Uri("https://casiut21.u-bourgogne.fr/logout");
+        internal static readonly Uri LoginUri = new("https://casiut21.u-bourgogne.fr/login");
+        internal static readonly Uri LogoutUri = new("https://casiut21.u-bourgogne.fr/logout");
 
-        internal static readonly Uri HomeUri = new Uri("https://iutdijon.u-bourgogne.fr/oge/stylesheets/etu/home.xhtml");
+        internal static readonly Uri HomeUri = new("https://iutdijon.u-bourgogne.fr/oge/stylesheets/etu/home.xhtml");
 
-        internal static readonly Uri ScheduleUri = new Uri("https://iutdijon.u-bourgogne.fr/oge/stylesheets/etu/planningEtu.xhtml");
-        internal static readonly Uri GradesUri = new Uri("https://iutdijon.u-bourgogne.fr/oge/stylesheets/etu/bilanEtu.xhtml");
+        internal static readonly Uri ScheduleUri = new("https://iutdijon.u-bourgogne.fr/oge/stylesheets/etu/planningEtu.xhtml");
+        internal static readonly Uri GradesUri = new("https://iutdijon.u-bourgogne.fr/oge/stylesheets/etu/bilanEtu.xhtml");
 
         #endregion
 
         /// <summary>
         /// Fake web browser used by Oge instance
         /// </summary>
-        public readonly FakeWebBrowser Browser = new FakeWebBrowser();
+        public readonly FakeWebBrowser Browser = new();
 
         /// <summary>
         /// Latest username used for login into OGE (used for auto-reconnect)

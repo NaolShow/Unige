@@ -11,7 +11,7 @@ namespace OgeSharp {
         /// <summary>
         /// Regex that extracts the ressource type
         /// </summary>
-        internal static Regex RessourceTypeRegex = new Regex(@"[\w]{2}\.[\w]{2}");
+        internal static Regex RessourceTypeRegex = new(@"[\w]{2}\.[\w]{2}");
 
         internal TimeSlot(dynamic slot) {
 

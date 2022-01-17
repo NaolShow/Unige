@@ -83,7 +83,7 @@ namespace UnigeWebUtility {
             if (response.Headers[HttpResponseHeader.Location] != null && AllowRedirections) {
 
                 // Create a uri from the location header
-                Uri redirection = new Uri(response.Headers[HttpResponseHeader.Location]);
+                Uri redirection = new(response.Headers[HttpResponseHeader.Location]);
 
                 // Initialize new redirection event and trigger the redirection event
                 OnRedirection?.Invoke(this, new RedirectionEventArgs() {
