@@ -1,4 +1,4 @@
-<img src="https://github.com/NaolShow/Unige/raw/readme/Assets/unige-large.png">
+<img src="https://github.com/NaolShow/Unige/raw/main/Assets/unige-large.png">
 
 ---
 
