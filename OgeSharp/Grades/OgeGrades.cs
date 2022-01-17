@@ -1,6 +1,8 @@
 ﻿using HtmlAgilityPack;
 using System;
 using System.Globalization;
+using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnigeWebUtility;
 
@@ -23,18 +25,61 @@ namespace OgeSharp {
         internal static readonly Regex CoefficientRegex = new(@"\(([0-9.]+)\)");
 
         /// <summary>
-        /// Returns an entry containing all your grades<br/>
-        /// For now it just get the selected semester, next update will let select one of them
+        /// Returns an entry containing all your grades of the specified semester<br/>
+        /// (If the requested semester is not published yet/do not exist it will return the latest semester)
         /// </summary>
-        public GradeEntry GetGrades() {
+        public GradeEntry GetGrades(Semester semester) {
 
-            // Download the grades page source code and parse it as a document
-            string gradesSource = Browser.Navigate(GradesUri).GetContent();
+            #region Request
+
+            // Initialize a POST request
+            HttpWebRequest request = Browser.CreateRequest(GradesUri);
+            request.Method = "POST";
+
+            // Add the headers (those are set when requesting directly from OGE)
+            request.Headers.Add("Faces-Request", "partial/ajax");
+            request.Headers.Add("X-Requested-With", "XMLHttpRequest");
+
+            // Initialize the request content builder
+            StringBuilder content = new();
+
+            // Set all the content
+            // => Some of them are useless BUT for a maximum compatibility let's keep all of them
+            content.Append("javax.faces.partial.ajax=true");
+            content.Append("&javax.faces.source=mainBilanForm%3Aj_id_1t");
+            content.Append("&javax.faces.partial.execute=mainBilanForm%3Aj_id_1t");
+            content.Append("&javax.faces.partial.render=mainBilanForm");
+            content.Append("&mainBilanForm%3Aj_id_1t=mainBilanForm%3Aj_id_1t");
+            content.Append("&mainBilanForm_SUBMIT=1");
+
+            // This one MUST be set to something
+            // => Else the server will think you are already on the requested page and send not what you want
+            content.Append("&javax.faces.ViewState=0");
+
+            // The requested semester
+            // => We decrease the requested one value by 1 because the first semester ID is 0
+            content.Append($"&mainBilanForm%3Aj_id_1t_menuid={(int)semester - 1}");
+            content.Append($"&i={(int)semester - 1}");
+
+            // Set the request content
+            request.SetContent("application/x-www-form-urlencoded; charset=UTF-8", content.ToString());
+
+            // Get the request source (encapsulated by [CDATA[]])
+            string source = Browser.ProcessRequest(request).GetContent();
+            // Extract the real source
+            source = source.Split("![CDATA[")[1].Split("]]")[0];
+
+            #endregion
+
+            // Parse the source as an html document
             HtmlDocument document = new();
-            document.LoadHtml(gradesSource);
+            document.LoadHtml(source);
+
+            // Get the name of the semester (ex: "2021/2022-INFO-1-Semestre 1")
+            string semesterName = document.DocumentNode.SelectSingleNode("//li[contains(@class, 'ui-state-active')]").InnerText;
 
             // Initialize a root entry
-            GradeEntry rootEntry = new("Root", 1);
+            GradeEntry rootEntry = new(semesterName, 1);
 
             // Loop through all the UE divs
             foreach (HtmlNode ueNode in document.DocumentNode.SelectNodes("//div[@class='moy_UE']")) {
@@ -103,6 +148,10 @@ namespace OgeSharp {
         }
 
         private static void ProcessGradeCategory(HtmlNode gradeCategoryNode, GradeEntry poleEntry) {
+
+            // If the row is empty
+            // => Can happen if OGE is configured badly (often when changing semester)
+            if (gradeCategoryNode.HasClass("ui-datatable-empty-message")) return;
 
             // Get the category name
             // => Also remove the trailing colon
