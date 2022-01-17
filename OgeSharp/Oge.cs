@@ -1,4 +1,6 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using System;
+using System.Linq;
 using System.Net;
 using UnigeWebUtility;
 
@@ -31,6 +33,15 @@ namespace OgeSharp {
         /// Latest password used for login into OGE (used for auto-reconnect)
         /// </summary>
         private string Password;
+
+        /// <summary>
+        /// First name of the OGE user (only available after login)
+        /// </summary>
+        public string FirstName { get; private set; }
+        /// <summary>
+        /// Last name of the OGE user (only available after login)
+        /// </summary>
+        public string LastName { get; private set; }
 
         public Oge() {
 
@@ -79,14 +90,29 @@ namespace OgeSharp {
 
                 // Go to the home page to finish correctly the login process
                 // => Fixes a bug where we get redirected to home after the first request
-                Browser.Navigate(HomeUri);
+                string source = Browser.Navigate(HomeUri).GetContent();
 
                 // Save the username and password
                 // => After the login to prevent infinite logout/login loop
                 Username = username;
                 Password = password;
 
-                // TODO: Get the account first/last name
+                #region First/Last name extraction
+
+                // Parse the home page source code
+                HtmlDocument document = new();
+                document.LoadHtml(source);
+
+                // Get the span's inner text (where there is the first and last name)
+                string nameText = document.DocumentNode.SelectSingleNode("//div[@id='topFormMenu:j_id_x_content']/div[last()]/span[1]").InnerText;
+
+                // Split it and assign it to the fields
+                // => In case the last name is composed (like "Jean Albert Louis") we take only the first word as the First Name
+                string[] splittedName = nameText.Split(' ');
+                FirstName = splittedName[0];
+                LastName = string.Join(' ', splittedName.Skip(1));
+
+                #endregion
 
                 return true;
 
