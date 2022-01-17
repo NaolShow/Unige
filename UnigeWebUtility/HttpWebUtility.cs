@@ -35,8 +35,11 @@ namespace UnigeWebUtility {
             // Get the response stream
             using Stream stream = response.GetResponseStream();
 
+            // Get the encoding from the response
+            var encoding = Encoding.GetEncoding(response.CharacterSet);
+
             // Convert the stream to a stream reader
-            using StreamReader reader = new(stream);
+            using StreamReader reader = new(stream, encoding);
 
             return reader.ReadToEnd();
 
