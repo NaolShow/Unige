@@ -21,9 +21,9 @@
 
 # Sommaire
 
-- [Unige](https://github.com/NaolShow/Unige/main/README.md#Unige)
-    - [À savoir](https://github.com/NaolShow/Unige/main/README.md#À-savoir)
-- [Logiciel de calcul de la moyenne](https://github.com/NaolShow/Unige/main/README.md#Logiciel-de-calcul-de-la-moyenne)
+- [Unige](https://github.com/NaolShow/Unige#unige)
+    - [À savoir](https://github.com/NaolShow/Unige#%C3%A0-savoir)
+- [Logiciel de calcul de la moyenne](https://github.com/NaolShow/Unige#logiciel-de-calcul-de-la-moyenne)
 
 ---
 
