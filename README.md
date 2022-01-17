@@ -38,7 +38,7 @@ Pour l'instant, Unige a plusieurs fonctionnalités:
         - Récupération de l'emploi du temps sur une journée
         - Récupération de l'emploi du temps (entre deux dates données)
     - [Notes](https://github.com/NaolShow/Unige/tree/main/OgeSharp/Grades)
-        - Récupération de toutes les notes (avec leur nom, coefficient...)
+        - Récupération de toutes les notes de n'importe quel semestre (avec leur nom, coefficient...)
 
 Comme vous pouvez le voir, Unige reste (pour l'instant) assez simple, mais d'autres fonctionnalités vont être rajoutées par la suite.
 
