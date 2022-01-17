@@ -149,6 +149,10 @@ namespace OgeSharp {
 
         private static void ProcessGradeCategory(HtmlNode gradeCategoryNode, GradeEntry poleEntry) {
 
+            // If the row is empty
+            // => Can happen if OGE is configured badly (often when changing semester)
+            if (gradeCategoryNode.HasClass("ui-datatable-empty-message")) return;
+
             // Get the category name
             // => Also remove the trailing colon
             string categoryName = gradeCategoryNode.SelectSingleNode("./td[1]").InnerText[0..^1];
