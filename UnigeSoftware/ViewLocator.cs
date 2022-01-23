@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using ReactiveUI;
 using System;
-using UnigeSoftware.ViewModels;
 
 namespace UnigeSoftware {
     public class ViewLocator : IDataTemplate {
@@ -16,8 +16,7 @@ namespace UnigeSoftware {
             }
         }
 
-        public bool Match(object data) {
-            return data is ViewModelBase;
-        }
+        public bool Match(object data) => data is ReactiveObject;
+
     }
 }

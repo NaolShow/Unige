@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OgeSharp", "OgeSharp\OgeSha
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnigeWebUtility", "UnigeWebUtility\UnigeWebUtility.csproj", "{3568E75E-90CB-4A03-B2E3-D8F413ABF68E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnigeSoftware", "UnigeSoftware\UnigeSoftware.csproj", "{991CA739-1B61-4D43-B7BF-88840944C08C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnigeSoftware", "UnigeSoftware\UnigeSoftware.csproj", "{991CA739-1B61-4D43-B7BF-88840944C08C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
