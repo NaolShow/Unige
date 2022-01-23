@@ -1,4 +1,6 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using System;
+using System.Linq;
 using System.Net;
 using UnigeWebUtility;
 
@@ -8,18 +10,20 @@ namespace OgeSharp {
 
         #region Constants
 
-        internal static readonly Uri LoginUri = new Uri("https://casiut21.u-bourgogne.fr/login");
-        internal static readonly Uri LogoutUri = new Uri("https://casiut21.u-bourgogne.fr/logout");
+        internal static readonly Uri LoginUri = new("https://casiut21.u-bourgogne.fr/login");
+        internal static readonly Uri LogoutUri = new("https://casiut21.u-bourgogne.fr/logout");
 
-        internal static readonly Uri ScheduleUri = new Uri("https://iutdijon.u-bourgogne.fr/oge/stylesheets/etu/planningEtu.xhtml");
-        internal static readonly Uri GradesUri = new Uri("https://iutdijon.u-bourgogne.fr/oge/stylesheets/etu/bilanEtu.xhtml");
+        internal static readonly Uri HomeUri = new("https://iutdijon.u-bourgogne.fr/oge/stylesheets/etu/home.xhtml");
+
+        internal static readonly Uri ScheduleUri = new("https://iutdijon.u-bourgogne.fr/oge/stylesheets/etu/planningEtu.xhtml");
+        internal static readonly Uri GradesUri = new("https://iutdijon.u-bourgogne.fr/oge/stylesheets/etu/bilanEtu.xhtml");
 
         #endregion
 
         /// <summary>
         /// Fake web browser used by Oge instance
         /// </summary>
-        public readonly FakeWebBrowser Browser = new FakeWebBrowser();
+        public readonly FakeWebBrowser Browser = new();
 
         /// <summary>
         /// Latest username used for login into OGE (used for auto-reconnect)
@@ -29,6 +33,15 @@ namespace OgeSharp {
         /// Latest password used for login into OGE (used for auto-reconnect)
         /// </summary>
         private string Password;
+
+        /// <summary>
+        /// First name of the OGE user (only available after login)
+        /// </summary>
+        public string FirstName { get; private set; }
+        /// <summary>
+        /// Last name of the OGE user (only available after login)
+        /// </summary>
+        public string LastName { get; private set; }
 
         public Oge() {
 
@@ -59,10 +72,6 @@ namespace OgeSharp {
         /// </summary>
         public bool Login(string username, string password) {
 
-            // Save the username and password
-            Username = username;
-            Password = password;
-
             // Download the login page source code and extract the execution token
             string loginSource = Browser.Navigate(LoginUri).GetContent();
             string execution = loginSource.Split("input type=\"hidden\" name=\"execution\" value=\"")[1].Split("\"/>")[0];
@@ -72,12 +81,39 @@ namespace OgeSharp {
             request.Method = "POST";
 
             // Set the content (username, password, execution token and _eventId)
-            request.SetContent("application/x-www-form-urlencoded", $"username={username}&password={password}&execution={execution}&_eventId=submit");
+            request.SetContent("application/x-www-form-urlencoded", $"username={WebUtility.UrlEncode(username)}&password={WebUtility.UrlEncode(password)}&execution={WebUtility.UrlEncode(execution)}&_eventId=submit");
 
             try {
 
                 // Login by processing the request
                 Browser.ProcessRequest(request);
+
+                // Go to the home page to finish correctly the login process
+                // => Fixes a bug where we get redirected to home after the first request
+                string source = Browser.Navigate(HomeUri).GetContent();
+
+                // Save the username and password
+                // => After the login to prevent infinite logout/login loop
+                Username = username;
+                Password = password;
+
+                #region First/Last name extraction
+
+                // Parse the home page source code
+                HtmlDocument document = new();
+                document.LoadHtml(source);
+
+                // Get the span's inner text (where there is the first and last name)
+                string nameText = document.DocumentNode.SelectSingleNode("//div[@id='topFormMenu:j_id_x_content']/div[last()]/span[1]").InnerText;
+
+                // Split it and assign it to the fields
+                // => In case the last name is composed (like "Jean Albert Louis") we take only the first word as the First Name
+                string[] splittedName = nameText.Split(' ');
+                FirstName = splittedName[0];
+                LastName = string.Join(' ', splittedName.Skip(1));
+
+                #endregion
+
                 return true;
 
             } catch (WebException ex) {

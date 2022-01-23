@@ -11,13 +11,13 @@ namespace OgeSharp {
         /// <summary>
         /// Returns the schedule of the current day
         /// </summary>
-        public void GetSchedule() => GetSchedule(DateTime.Now);
+        public Schedule GetSchedule() => GetSchedule(DateTime.Now);
 
         /// <summary>
         /// Returns the schedule of the specified day<br/>
         /// (Note: OGE ignores the time part of the datetime. So it will return all the time slots of the specified day)
         /// </summary>
-        public void GetSchedule(DateTime date) => GetSchedule(date, date);
+        public Schedule GetSchedule(DateTime date) => GetSchedule(date, date);
 
         /// <summary>
         /// Returns the schedule between the two specified days<br/>
@@ -54,7 +54,7 @@ namespace OgeSharp {
             List<dynamic> slots = JsonSerializer.Deserialize<dynamic>(json)["events"];
 
             // Initialize a schedule instance
-            Schedule schedule = new Schedule(start, end, slots.Count);
+            Schedule schedule = new(start, end, slots.Count);
 
             // Loop through all the time slots
             for (int i = 0; i < slots.Count; i++) {

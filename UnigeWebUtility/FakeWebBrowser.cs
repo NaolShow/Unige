@@ -49,7 +49,7 @@ namespace UnigeWebUtility {
             request.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9";
 
             // Enable the automatic decompression
-            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            request.AutomaticDecompression = DecompressionMethods.All;
 
             // Set the request cookies
             request.CookieContainer = Cookies;
@@ -80,10 +80,10 @@ namespace UnigeWebUtility {
 
             // If there is a redirection and the browser allow redirections
             // => Navigate to the specified uri and return that response instead
-            if (response.Headers[HttpResponseHeader.Location] != null && AllowRedirections == true) {
+            if (response.Headers[HttpResponseHeader.Location] != null && AllowRedirections) {
 
                 // Create a uri from the location header
-                Uri redirection = new Uri(response.Headers[HttpResponseHeader.Location]);
+                Uri redirection = new(response.Headers[HttpResponseHeader.Location]);
 
                 // Initialize new redirection event and trigger the redirection event
                 OnRedirection?.Invoke(this, new RedirectionEventArgs() {

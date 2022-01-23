@@ -29,7 +29,7 @@ namespace OgeSharp {
             get {
 
                 // Initialize an empty time span
-                TimeSpan span = new TimeSpan();
+                TimeSpan span = new();
 
                 // Loop through the time slots and add their duration
                 foreach (TimeSlot slot in Slots) span = span.Add(slot.Duration);
