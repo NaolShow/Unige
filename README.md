@@ -24,6 +24,7 @@
 - [Unige](https://github.com/NaolShow/Unige#unige)
     - [Projets](https://github.com/NaolShow/Unige#projets)
     - [À savoir](https://github.com/NaolShow/Unige#%C3%A0-savoir)
+    - [Documentation](https://github.com/NaolShow/Unige#documentation)
 - [Logiciel de calcul de la moyenne](https://github.com/NaolShow/Unige#logiciel-de-calcul-de-la-moyenne)
 
 ---
@@ -52,6 +53,11 @@ Et malheureusement, je ne peux pas savoir à l'avance quand cela va se produire 
 
 Si cela arrive, hésitez pas à faire [un bug report sur Github](https://github.com/NaolShow/Unige/issues) en expliquant le problème. Je vais le résoudre rapidement.
 (Ou alors contactez-moi directement: **NaolShow#7243**)
+
+## Documentation
+
+La documentation d'Unige et de ses modules est présente sur le répertoire Github:
+https://github.com/NaolShow/Unige/wiki
 
 # Logiciel de calcul de la moyenne
 
