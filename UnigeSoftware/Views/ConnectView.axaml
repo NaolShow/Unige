@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:UnigeSoftware.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="UnigeSoftware.Views.ConnectView">
+
+  <Panel>
+
+    <StackPanel Margin="0,0,0,32" Width="360" VerticalAlignment="Center">
+
+      <TextBlock Margin="0,0,0,16" HorizontalAlignment="Center">Connexion à OGE</TextBlock>
+
+      <!-- Username -->
+      <TextBlock Margin="0,0,0,4">Nom d'utilisateur:</TextBlock>
+      <TextBox Text="{Binding Username}" Watermark="xy012345"></TextBox>
+      <TextBlock x:Name="UsernameError" Foreground="Red"/>
+      
+      <!-- Password -->
+      <TextBlock Margin="0,8,0,4">Mot de passe:</TextBlock>
+      <TextBox Text="{Binding Password}" Watermark="*****" PasswordChar="*" RevealPassword="{Binding #RevealPassword.IsChecked}"></TextBox>
+      <TextBlock x:Name="PasswordError" Foreground="Red"/>
+
+      <!-- Show password -->
+      <CheckBox x:Name="RevealPassword" HorizontalAlignment="Right" Content="Afficher le mot de passe" Margin="0,8,0,0"/>
+      
+      <!-- Connect -->
+      <Button Content="Se connecter" IsEnabled="{Binding !IsConnecting}" Command="{Binding ConnectCommand}" Margin="0,8,0,0" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch"/>
+
+    </StackPanel>
+
+    <!-- Utility buttons -->
+    <StackPanel Margin="8" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+
+      <!-- Github -->
+      <Button Command="{Binding OpenFromExplorerCommand}" CommandParameter="https://github.com/NaolShow/Unige" ToolTip.Tip="Ou retrouver Unige ?">
+        <Image Height="24" Source="/Assets/github-mark-light.png"></Image>
+      </Button>
+      <!-- Discord -->
+      <Button Command="{Binding OpenFromExplorerCommand}" CommandParameter="https://discord.gg/m7CZ6md" ToolTip.Tip="Besoin d'aide ? Discord du développeur!">
+        <Image Height="24" Source="/Assets/discord-mark-light.png"></Image>
+      </Button>
+      <!-- Help -->
+      <Button Command="{Binding OpenFromExplorerCommand}" CommandParameter="https://github.com/NaolShow/Unige/wiki" ToolTip.Tip="Qu'est-ce qu'Unige?">
+        <TextBlock FontWeight="ExtraBold" Height="24" Padding="3">?</TextBlock>
+      </Button>
+
+    </StackPanel>
+
+  </Panel>
+
+</UserControl>
