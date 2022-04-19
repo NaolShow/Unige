@@ -1,70 +1,73 @@
-﻿using System;
-using System.Text.RegularExpressions;
+﻿// <copyright file="TimeSlot.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
-namespace OgeSharp {
+namespace OgeSharp.Schedule
+{
+    using System;
+    using System.Text.RegularExpressions;
 
     /// <summary>
     /// Stores informations about a time slot
     /// </summary>
-    public class TimeSlot {
-
+    public class TimeSlot
+    {
         /// <summary>
         /// Regex that extracts the ressource type
         /// </summary>
-        internal static Regex RessourceTypeRegex = new(@"[\w]{2}\.[\w]{2}");
+        private static readonly Regex RessourceTypeRegex = new(@"[\w]{2}\.[\w]{2}");
 
-        internal TimeSlot(dynamic slot) {
-
+        internal TimeSlot(dynamic slot)
+        {
             // Parse the start and end time
             Start = DateTime.Parse(slot["start"]);
             End = DateTime.Parse(slot["end"]);
             Duration = End - Start;
 
             // Get the teacher and room
-            string[] description = ((string)slot["title"]).Split('\n');
+            string[] description = ((string) slot["title"]).Split('\n');
             Teacher = description[2].Trim();
             Room = description[1].Trim();
 
             // Get the title
-            FullTitle = ((string)slot["description"]).Trim();
-
+            FullTitle = ((string) slot["description"]).Trim();
         }
 
-        #region Dates and Times
 
         /// <summary>
-        /// DateTime at which the class starts
+        /// Gets dateTime at which the class starts
         /// </summary>
         public DateTime Start { get; }
+
         /// <summary>
-        /// DateTime at which the class ends
+        /// Gets dateTime at which the class ends
         /// </summary>
         public DateTime End { get; }
+
         /// <summary>
-        /// TimeSpan that represents the duration of the class
+        /// Gets timeSpan that represents the duration of the class
         /// </summary>
         public TimeSpan Duration { get; }
 
-        #endregion
 
         /// <summary>
-        /// Teacher's full name
+        /// Gets teacher's full name
         /// </summary>
         public string Teacher { get; }
+
         /// <summary>
-        /// Room number/id
+        /// Gets room number/id
         /// </summary>
         public string Room { get; }
 
         /// <summary>
-        /// Full title of the class
+        /// Gets full title of the class
         /// </summary>
         public string FullTitle { get; }
+
         /// <summary>
         /// Associated ressource of the class
         /// </summary>
         public string Ressource => RessourceTypeRegex.Match(FullTitle)?.Groups[0].Value;
-
     }
-
 }
