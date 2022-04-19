@@ -1,11 +1,12 @@
-﻿using System.IO;
-using System.Net;
-using System.Text;
+﻿namespace UnigeWebUtility
+{
+    using System;
+    using System.IO;
+    using System.Net;
+    using System.Text;
 
-namespace UnigeWebUtility {
-
-    public static class HttpWebUtility {
-
+    public static class HttpWebUtility
+    {
         /// <summary>
         /// Sets the http web request content to the specified content type and the UTF8 encoded string
         /// </summary>
@@ -15,36 +16,34 @@ namespace UnigeWebUtility {
         /// <summary>
         /// Sets the http web request content to the specified content type and byte array
         /// </summary>
-        public static void SetContent(this HttpWebRequest request, string contentType, byte[] content) {
-
+        public static void SetContent(this HttpWebRequest request, string contentType, byte[] content)
+        {
             // Set the request content type and length
             request.ContentType = contentType;
             request.ContentLength = content.Length;
 
             // Write the content to the request stream
-            using Stream stream = request.GetRequestStream();
+            using var stream = request.GetRequestStream();
             stream.Write(content, 0, content.Length);
-
         }
 
         /// <summary>
         /// Gets the content of the http web response
         /// </summary>
-        public static string GetContent(this HttpWebResponse response) {
-
+        /// <returns></returns>
+        public static string GetContent(this HttpWebResponse response)
+        {
             // Get the response stream
-            using Stream stream = response.GetResponseStream();
+            using var stream = response.GetResponseStream();
 
             // Get the encoding from the response
-            var encoding = Encoding.GetEncoding(response.CharacterSet);
+            var encoding = Encoding.GetEncoding(response.CharacterSet
+                                                ?? throw new InvalidOperationException());
 
             // Convert the stream to a stream reader
-            using StreamReader reader = new(stream, encoding);
+            using var reader = new StreamReader(stream, encoding);
 
             return reader.ReadToEnd();
-
         }
-
     }
-
 }
